@@ -33,9 +33,9 @@ public class Nightlight.Indicator : Wingpanel.Indicator {
     }
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
-        Object (code_name: "wingpanel-indicator-nightlight",
-                display_name: _("Nightlight"),
-                description: _("The Nightlight indicator"));
+        Object (code_name: "wingpanel-indicator-hackspeed",
+                display_name: _("Hackspeed"),
+                description: _("The Hackspeed indicator"));
     }
 
     public override Gtk.Widget get_display_widget () {
@@ -93,7 +93,7 @@ public class Nightlight.Indicator : Wingpanel.Indicator {
 }
 
 public Wingpanel.Indicator? get_indicator (Module module, Wingpanel.IndicatorManager.ServerType server_type) {
-    debug ("Activating Nightlight Indicator");
+    debug ("Activating Hackspeed Indicator");
 
     if (server_type != Wingpanel.IndicatorManager.ServerType.SESSION) {
         debug ("Wingpanel is not in session, not loading nightlight");
@@ -105,6 +105,8 @@ public Wingpanel.Indicator? get_indicator (Module module, Wingpanel.IndicatorMan
         debug ("No night-light schema found");
         return null;
     }
+
+    debug ("Yay me");
 
     var indicator = new Nightlight.Indicator (server_type);
     return indicator;
