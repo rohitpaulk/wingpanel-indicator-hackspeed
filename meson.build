@@ -1,5 +1,5 @@
 project(
-    'nightlight',
+    'hackspeed',
     'vala', 'c',
     version: '2.0.3'
 )
