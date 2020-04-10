@@ -1,0 +1,37 @@
+# Language szl translations for extra package.
+# Copyright (C) 2019 THE extra'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the extra package.
+# Automatically generated, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: extra\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-07 11:18-0800\n"
+"PO-Revision-Date: 2020-02-23 00:08+0000\n"
+"Last-Translator: gkkulik <g.kulik@o2.pl>\n"
+"Language-Team: Silesian <https://l10n.elementary.io/projects/wingpanel/"
+"indicator-nightlight-extra/szl/>\n"
+"Language: szl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 3.9.1\n"
+
+#: data/nightlight.appdata.xml.in:6
+msgid "Nightlight Indicator"
+msgstr "Skaźnik nocnego światła"
+
+#: data/nightlight.appdata.xml.in:7
+msgid "Easily snooze or adjust the temperature of Nightlight"
+msgstr "Prosto zastow abo naszteluj tymperatura nocnego światła"
+
+#: data/nightlight.appdata.xml.in:11
+msgid "Updated translations"
+msgstr "Zaktualizowane przekłady"
+
+#: data/nightlight.appdata.xml.in:20
+msgid "elementary, Inc."
+msgstr "elementary, Inc."
