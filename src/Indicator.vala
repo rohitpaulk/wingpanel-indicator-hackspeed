@@ -18,77 +18,49 @@
  */
 
 public class Hackspeed.Indicator : Wingpanel.Indicator {
-    private Gtk.Spinner? indicator_icon = null;
+    private Gtk.Box? display_widget = null;
     private Gtk.StyleContext style_context;
-    private Nightlight.Widgets.PopoverWidget? popover_widget = null;
-
-    public bool nightlight_state {
-        set {
-            if (value) {
-                style_context.remove_class ("disabled");
-            } else {
-                style_context.add_class ("disabled");
-            }
-        }
-    }
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
-        Object (code_name: "wingpanel-indicator-hackspeed");
+        Object (
+			code_name: "wingpanel-indicator-hackspeed" // Testing
+		);
     }
 
+	construct {
+		// Visible on startup
+		this.visible = true;
+	}
+
     public override Gtk.Widget get_display_widget () {
-        if (indicator_icon == null) {
+        if (display_widget == null) {
             weak Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
             default_theme.add_resource_path ("/com.github.rohitpaulk.wingpanel-indicator-hackspeed");
 
-            indicator_icon = new Gtk.Spinner ();
-
+            var icon = new Gtk.Spinner ();
+			var text = new Gtk.Label("66 wpm");
             var provider = new Gtk.CssProvider ();
             provider.load_from_resource ("com.github.rohitpaulk.wingpanel-indicator-hackspeed/indicator.css");
 
-            style_context = indicator_icon.get_style_context ();
+            style_context = icon.get_style_context ();
             style_context.add_class ("night-light-icon");
             style_context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-            indicator_icon.button_press_event.connect ((e) => {
-                if (e.button == Gdk.BUTTON_MIDDLE) {
-                    NightLight.Manager.get_instance ().toggle_snooze ();
-                    return Gdk.EVENT_STOP;
-                }
+			icon.button_press_event.connect( (event) => { debug("clicked"); return false; } );
 
-                return Gdk.EVENT_PROPAGATE;
-            });
-
-            var nightlight_manager = NightLight.Manager.get_instance ();
-            nightlight_manager.snooze_changed.connect ((value) => {
-                nightlight_state = !value;
-                popover_widget.snoozed = value;
-            });
-
-            nightlight_manager.active_changed.connect ((value) => {
-				debug ("Nightlight Manager active changed");
-				visible = true;
-            });
-
-            nightlight_state = !nightlight_manager.snoozed;
-            // visible = nightlight_manager.active;
-			visible = true;
+			this.display_widget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+			this.display_widget.add(icon);
+			this.display_widget.add(text);
         }
 
-        return indicator_icon;
+        return this.display_widget;
     }
 
     public override Gtk.Widget? get_widget () {
-        if (popover_widget == null) {
-            var settings = new GLib.Settings ("org.gnome.settings-daemon.plugins.color");
-            popover_widget = new Nightlight.Widgets.PopoverWidget (this, settings);
-        }
-
-        return popover_widget;
+		return new Gtk.Label("testing");
     }
 
     public override void opened () {}
-
     public override void closed () {}
 }
 
@@ -96,7 +68,8 @@ public Wingpanel.Indicator? get_indicator (Module module, Wingpanel.IndicatorMan
     debug ("Activating Hackspeed Indicator");
 
     if (server_type != Wingpanel.IndicatorManager.ServerType.SESSION) {
-        debug ("Wingpanel is not in session, not loading hackspeed");
+        // We want to display our sample indicator only in the "normal" session,
+        // not on the login screen, so stop here!
         return null;
     }
 
