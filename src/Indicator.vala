@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301 USA
  */
 
-public class Nightlight.Indicator : Wingpanel.Indicator {
+public class Hackspeed.Indicator : Wingpanel.Indicator {
     private Gtk.Spinner? indicator_icon = null;
     private Gtk.StyleContext style_context;
     private Nightlight.Widgets.PopoverWidget? popover_widget = null;
@@ -33,9 +33,7 @@ public class Nightlight.Indicator : Wingpanel.Indicator {
     }
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
-        Object (code_name: "wingpanel-indicator-hackspeed",
-                display_name: _("Hackspeed"),
-                description: _("The Hackspeed indicator"));
+        Object (code_name: "wingpanel-indicator-hackspeed");
     }
 
     public override Gtk.Widget get_display_widget () {
@@ -68,11 +66,13 @@ public class Nightlight.Indicator : Wingpanel.Indicator {
             });
 
             nightlight_manager.active_changed.connect ((value) => {
-                visible = value;
+				debug ("Nightlight Manager active changed");
+				visible = true;
             });
 
             nightlight_state = !nightlight_manager.snoozed;
-            visible = nightlight_manager.active;
+            // visible = nightlight_manager.active;
+			visible = true;
         }
 
         return indicator_icon;
@@ -96,18 +96,10 @@ public Wingpanel.Indicator? get_indicator (Module module, Wingpanel.IndicatorMan
     debug ("Activating Hackspeed Indicator");
 
     if (server_type != Wingpanel.IndicatorManager.ServerType.SESSION) {
-        debug ("Wingpanel is not in session, not loading nightlight");
+        debug ("Wingpanel is not in session, not loading hackspeed");
         return null;
     }
 
-    var interface_settings_schema = SettingsSchemaSource.get_default ().lookup ("org.gnome.settings-daemon.plugins.color", true);
-    if (interface_settings_schema == null || !interface_settings_schema.has_key ("night-light-enabled")) {
-        debug ("No night-light schema found");
-        return null;
-    }
-
-    debug ("Yay me");
-
-    var indicator = new Nightlight.Indicator (server_type);
+    var indicator = new Hackspeed.Indicator (server_type);
     return indicator;
 }

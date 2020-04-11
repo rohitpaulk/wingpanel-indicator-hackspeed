@@ -18,7 +18,7 @@
  */
 
 public class Nightlight.Widgets.PopoverWidget : Gtk.Grid {
-    public unowned Nightlight.Indicator indicator { get; construct set; }
+    public unowned Hackspeed.Indicator indicator { get; construct set; }
     public unowned Settings settings { get; construct set; }
 
     private NightLight.Widgets.Switch toggle_switch;
@@ -55,7 +55,7 @@ public class Nightlight.Widgets.PopoverWidget : Gtk.Grid {
         }
     }
 
-    public PopoverWidget (Nightlight.Indicator indicator, Settings settings) {
+    public PopoverWidget (Hackspeed.Indicator indicator, Settings settings) {
         Object (indicator: indicator, settings: settings);
     }
 
