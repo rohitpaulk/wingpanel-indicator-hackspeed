@@ -20,17 +20,27 @@
 public class Hackspeed.Indicator : Wingpanel.Indicator {
     private Gtk.Box? display_widget = null;
     private Gtk.StyleContext style_context;
+	private Pid child_pid;
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
-        Object (
-			code_name: "wingpanel-indicator-hackspeed" // Testing
-		);
-    }
+		// Unique name
+        Object (code_name: "wingpanel-indicator-hackspeed");
 
-	construct {
 		// Visible on startup
 		this.visible = true;
-	}
+
+		Process.spawn_async(
+			"/tmp",
+			{"sh", "-c", "echo $$ >> /tmp/echo && sleep 60"},
+			Environ.get(),
+			SpawnFlags.SEARCH_PATH,
+			null,
+			out this.child_pid
+		);
+
+		debug ("Found pid");
+		debug (this.child_pid.to_string());
+    }
 
     public override Gtk.Widget get_display_widget () {
         if (display_widget == null) {
