@@ -21,6 +21,7 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
     private Gtk.Box? display_widget = null;
     private Gtk.StyleContext style_context;
 	private Pid child_pid;
+	private IOChannel child_stdout_channel;
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
 		// Unique name
@@ -29,18 +30,51 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 		// Visible on startup
 		this.visible = true;
 
-		Process.spawn_async(
+		int child_stdout;
+
+		Process.spawn_async_with_pipes(
 			"/tmp",
-			{"sh", "-c", "echo $$ >> /tmp/echo && sleep 60"},
+			{"sh", "-c", "xinput test 10"},
 			Environ.get(),
 			SpawnFlags.SEARCH_PATH,
 			null,
-			out this.child_pid
+			out this.child_pid,
+			null,
+			out child_stdout,
+			null
 		);
 
-		debug ("Found pid");
-		debug (this.child_pid.to_string());
+		this.child_stdout_channel = new IOChannel.unix_new(child_stdout);
+		child_stdout_channel.add_watch (IOCondition.IN | IOCondition.HUP, (channel, condition) => {
+			return process_line(channel, condition, "stdout");
+		});
+
+		// debug ("Found pid");
+		// debug (this.child_pid.to_string());
     }
+
+	private static bool process_line (IOChannel channel, IOCondition condition, string stream_name) {
+		if (condition == IOCondition.HUP) {
+			debug ("%s: The fd has been closed.\n", stream_name);
+			return false;
+		}
+
+		debug ("process_line called");
+
+		try {
+			string data;
+			channel.read_line (out data, null, null);
+			print ("%s: %s", stream_name, data);
+		} catch (IOChannelError e) {
+			print ("%s: IOChannelError: %s\n", stream_name, e.message);
+			return false;
+		} catch (ConvertError e) {
+			print ("%s: ConvertError: %s\n", stream_name, e.message);
+			return false;
+		}
+
+		return true;
+	}
 
     public override Gtk.Widget get_display_widget () {
         if (display_widget == null) {
