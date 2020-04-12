@@ -25,6 +25,7 @@ wingpanel_indicatorsdir = wingpanel_dep.get_pkgconfig_variable('indicatorsdir', 
 shared_module(
     meson.project_name(),
     'src/Indicator.vala',
+    'src/KeystrokeRecorder.vala',
     'src/Services/ColorInterface.vala',
     'src/Widgets/PopoverWidget.vala',
     'src/Widgets/RevealerSwitch.vala',
