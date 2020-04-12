@@ -22,6 +22,7 @@ struct Keystroke {
 	char character;
 }
 
+
 public class Hackspeed.KeystrokeRecorder {
 	private Keystroke[] keystrokes;
 	private string keyboard_id;
@@ -73,6 +74,8 @@ public class Hackspeed.KeystrokeRecorder {
 			string data;
 			channel.read_line (out data, null, null);
 			print ("%s: %s", stream_name, data);
+			var ch = (new XInputLogParser()).parse_line(data);
+			debug ("processed char: %s", (ch == null) ? "UNKNOWN" : ch.to_string());
 		} catch (IOChannelError e) {
 			print ("%s: IOChannelError: %s\n", stream_name, e.message);
 			return false;
