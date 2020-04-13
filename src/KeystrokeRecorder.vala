@@ -39,14 +39,14 @@ public struct TypingSpeed {
 public class Hackspeed.KeystrokeRecorder {
 	public signal void keystroke_recorded (char character);
 
-	private Keystroke[] keystrokes;
+	private Gee.ArrayList<Keystroke?> keystrokes;
 	private string keyboard_id;
 
 	private Pid child_pid;
 	private IOChannel child_stdout_channel;
 
 	public KeystrokeRecorder() {
-		this.keystrokes = {};
+		this.keystrokes = new Gee.ArrayList<Keystroke?>();
 	}
 
 	public void start(string keyboard_id) {
@@ -74,19 +74,19 @@ public class Hackspeed.KeystrokeRecorder {
 	}
 
 	public int get_recent_keystrokes_count() {
-		return this.keystrokes.length;
+		return this.keystrokes.size;
 	}
 
 	public TypingSpeed? get_typing_speed() {
-		if (this.keystrokes.length < 2) {
+		if (this.keystrokes.size < 2) {
 			return null;
 		}
 
 		var first_ts = this.keystrokes[0].timestamp;
-		var last_ts = this.keystrokes[this.keystrokes.length-1].timestamp;
+		var last_ts = this.keystrokes[this.keystrokes.size-1].timestamp;
 
 		return TypingSpeed() {
-			character_count = this.keystrokes.length,
+			character_count = this.keystrokes.size,
 			interval_secs = (last_ts.difference(first_ts) / 1000000.0)
 		};
 	}
@@ -96,14 +96,27 @@ public class Hackspeed.KeystrokeRecorder {
 	}
 
 	private void record_keystroke (char ch) {
-		this.keystrokes += Keystroke() {
-				timestamp = new DateTime.now(),
-				character = ch
-		};
+		this.keystrokes.add(Keystroke() {
+			timestamp = new DateTime.now(),
+			character = ch
+		});
 
+		this.delete_stale_keystrokes();
 		this.keystroke_recorded(ch);
 
 	    debug("Number of keystrokes: %s", this.get_recent_keystrokes_count().to_string());
+	}
+
+	private void delete_stale_keystrokes () {
+		var now = new DateTime.now();
+		var first_ts = this.keystrokes[0].timestamp;
+		var interval = TimeSpan.SECOND * 20;
+
+		if (now.difference(first_ts) > interval) {
+			debug("deleted stale timestamp");
+			this.keystrokes.remove_at(0);
+			first_ts = this.keystrokes[0].timestamp;
+		}
 	}
 
 	private bool process_line (IOChannel channel, IOCondition condition, string stream_name) {
