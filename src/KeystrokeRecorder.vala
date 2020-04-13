@@ -22,8 +22,23 @@ struct Keystroke {
 	char character;
 }
 
+struct TypingSpeed {
+	int character_count;
+	int interval_secs;
+
+	public double words_per_minute() {
+		return (characters_per_minute() / 5.0);
+	}
+
+	public double characters_per_minute() {
+		return ((double) character_count / (double) interval_secs);
+	}
+}
+
 
 public class Hackspeed.KeystrokeRecorder {
+	public signal void keystroke_recorded (char character);
+
 	private Keystroke[] keystrokes;
 	private string keyboard_id;
 
@@ -58,8 +73,37 @@ public class Hackspeed.KeystrokeRecorder {
 		});
 	}
 
+	public int get_recent_keystrokes_count() {
+		return this.keystrokes.length;
+	}
+
+	public TypingSpeed? get_typing_speed() {
+		if (this.keystrokes.length < 2) {
+			return null;
+		}
+
+		var first_ts = this.keystrokes[0].timestamp
+		var last_ts = this.keystrokes[-1].timestamp
+
+		return TypingSpeed() {
+			character_count = this.keystrokes.length,
+			interval_seconds = (last_ts.difference(first_ts) / 1000000.0),
+		}
+	}
+
 	public void stop() {
 		debug("Stopping recording");
+	}
+
+	private void record_keystroke (char ch) {
+		this.keystrokes += Keystroke() {
+				timestamp = new DateTime.now(),
+				character = ch
+		};
+
+		this.keystroke_recorded(ch);
+
+	    debug("Number of keystrokes: %s", this.get_recent_keystrokes_count().to_string());
 	}
 
 	private bool process_line (IOChannel channel, IOCondition condition, string stream_name) {
@@ -68,14 +112,15 @@ public class Hackspeed.KeystrokeRecorder {
 			return false;
 		}
 
-		debug ("process_line called");
-
 		try {
 			string data;
 			channel.read_line (out data, null, null);
 			print ("%s: %s", stream_name, data);
 			var ch = (new XInputLogParser()).parse_line(data);
 			debug ("processed char: %s", (ch == null) ? "UNKNOWN" : ch.to_string());
+			if (ch != null) {
+				this.record_keystroke(ch);
+			}
 		} catch (IOChannelError e) {
 			print ("%s: IOChannelError: %s\n", stream_name, e.message);
 			return false;

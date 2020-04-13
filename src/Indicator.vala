@@ -18,8 +18,7 @@
  */
 
 public class Hackspeed.Indicator : Wingpanel.Indicator {
-    private Gtk.Box? display_widget = null;
-    private Gtk.StyleContext style_context;
+    private IndicatorWidget indicator_widget = null;
 	private Hackspeed.KeystrokeRecorder keystroke_recorder;
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
@@ -28,31 +27,20 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 
 		this.keystroke_recorder = new Hackspeed.KeystrokeRecorder();
 		this.keystroke_recorder.start("10");
+		this.indicator_widget = new IndicatorWidget("0 wpm");
+
+		this.keystroke_recorder.keystroke_recorded.connect(() => {
+			this.indicator_widget.set_text(
+				"%s wpm".printf(this.keystroke_recorder.get_recent_keystrokes_count().to_string())
+			);
+		});
 
 		// Visible on startup
 		this.visible = true;
-
-		Gtk.IconTheme default_theme = Gtk.IconTheme.get_default ();
-		default_theme.add_resource_path ("/com.github.rohitpaulk.wingpanel-indicator-hackspeed");
-
-		var icon = new Gtk.Spinner ();
-		var text = new Gtk.Label("66 wpm");
-		var provider = new Gtk.CssProvider ();
-		provider.load_from_resource ("com.github.rohitpaulk.wingpanel-indicator-hackspeed/indicator.css");
-
-		style_context = icon.get_style_context ();
-		style_context.add_class ("night-light-icon");
-		style_context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-
-		icon.button_press_event.connect( (event) => { debug("clicked"); return false; } );
-
-		this.display_widget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-		this.display_widget.add(icon);
-		this.display_widget.add(text);
     }
 
     public override Gtk.Widget get_display_widget () {
-        return this.display_widget;
+        return this.indicator_widget.get_gtk_widget();
     }
 
     public override Gtk.Widget? get_widget () {
