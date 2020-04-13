@@ -30,14 +30,19 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 		this.indicator_widget = new IndicatorWidget("0 wpm");
 
 		this.keystroke_recorder.keystroke_recorded.connect(() => {
-			this.indicator_widget.set_text(
-				"%s wpm".printf(this.keystroke_recorder.get_recent_keystrokes_count().to_string())
-			);
+			this.update_speed_label();
 		});
 
 		// Visible on startup
 		this.visible = true;
     }
+
+	private void update_speed_label() {
+		var typing_speed = this.keystroke_recorder.get_typing_speed();
+
+		double wpm = (typing_speed == null) ? 0.0 : typing_speed.words_per_minute();
+		this.indicator_widget.set_text("%s wpm".printf(Math.round(wpm).to_string()));
+	}
 
     public override Gtk.Widget get_display_widget () {
         return this.indicator_widget.get_gtk_widget();

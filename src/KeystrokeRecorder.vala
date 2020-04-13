@@ -22,16 +22,16 @@ struct Keystroke {
 	char character;
 }
 
-struct TypingSpeed {
+public struct TypingSpeed {
 	int character_count;
-	int interval_secs;
+	double interval_secs;
 
 	public double words_per_minute() {
 		return (characters_per_minute() / 5.0);
 	}
 
 	public double characters_per_minute() {
-		return ((double) character_count / (double) interval_secs);
+		return ((double) character_count * 60 / interval_secs);
 	}
 }
 
@@ -82,13 +82,13 @@ public class Hackspeed.KeystrokeRecorder {
 			return null;
 		}
 
-		var first_ts = this.keystrokes[0].timestamp
-		var last_ts = this.keystrokes[-1].timestamp
+		var first_ts = this.keystrokes[0].timestamp;
+		var last_ts = this.keystrokes[this.keystrokes.length-1].timestamp;
 
 		return TypingSpeed() {
 			character_count = this.keystrokes.length,
-			interval_seconds = (last_ts.difference(first_ts) / 1000000.0),
-		}
+			interval_secs = (last_ts.difference(first_ts) / 1000000.0)
+		};
 	}
 
 	public void stop() {
