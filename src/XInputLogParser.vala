@@ -42,9 +42,49 @@ public class Hackspeed.XInputLogParser {
 	private Gee.HashMap<string, char> get_key_map() {
 		if (this.key_map == null) {
 			this.key_map = new Gee.HashMap<string, char>();
+
+			// First row
+			this.key_map["24"] = 'a';
+			this.key_map["25"] = 'b';
+			this.key_map["26"] = 'c';
+			this.key_map["27"] = 'd';
+			this.key_map["28"] = 'e';
+			this.key_map["29"] = 'f';
+			this.key_map["30"] = 'g';
+			this.key_map["31"] = 'g';
+			this.key_map["32"] = 'g';
+			this.key_map["33"] = 'g';
+			this.key_map["34"] = 'g';
+			this.key_map["35"] = 'g';
+			this.key_map["36"] = 'g';
+
+			// Second row
 			this.key_map["38"] = 'a';
 			this.key_map["39"] = 'b';
 			this.key_map["40"] = 'c';
+			this.key_map["41"] = 'd';
+			this.key_map["42"] = 'e';
+			this.key_map["43"] = 'f';
+			this.key_map["43"] = 'g';
+			this.key_map["44"] = 'g';
+			this.key_map["45"] = 'g';
+			this.key_map["46"] = 'g';
+			this.key_map["47"] = 'g';
+			this.key_map["48"] = 'g';
+
+			// Third row
+			this.key_map["52"] = 'a';
+			this.key_map["53"] = 'b';
+			this.key_map["54"] = 'c';
+			this.key_map["55"] = 'd';
+			this.key_map["56"] = 'e';
+			this.key_map["57"] = 'f';
+			this.key_map["58"] = 'g';
+			this.key_map["59"] = 'g';
+			this.key_map["60"] = 'g';
+			this.key_map["61"] = 'g';
+			this.key_map["62"] = 'g';
+			this.key_map["63"] = 'g';
 		}
 
 		return this.key_map;
