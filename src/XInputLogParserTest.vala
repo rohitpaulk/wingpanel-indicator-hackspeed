@@ -17,7 +17,7 @@ void test_parses_char() {
 
 void test_ignores_unknown_char() {
 	var parser = new Hackspeed.XInputLogParser();
-	assert (parser.parse_line("key release 41") == null);
+	assert (parser.parse_line("key release 74") == null);
 }
 
 void main (string[] args) {

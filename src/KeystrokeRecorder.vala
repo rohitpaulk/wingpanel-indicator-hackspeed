@@ -17,24 +17,10 @@
  * Boston, MA 02110-1301 USA
  */
 
-struct Keystroke {
+public struct Keystroke {
 	DateTime timestamp;
 	char character;
 }
-
-public struct TypingSpeed {
-	int character_count;
-	double interval_secs;
-
-	public double words_per_minute() {
-		return (characters_per_minute() / 5.0);
-	}
-
-	public double characters_per_minute() {
-		return ((double) character_count * 60 / interval_secs);
-	}
-}
-
 
 public class Hackspeed.KeystrokeRecorder {
 	public signal void keystroke_recorded (char character);

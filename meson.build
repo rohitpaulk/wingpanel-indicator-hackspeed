@@ -28,9 +28,7 @@ shared_module(
     'src/IndicatorWidget.vala',
     'src/KeystrokeRecorder.vala',
     'src/XInputLogParser.vala',
-    'src/Services/ColorInterface.vala',
-    'src/Widgets/PopoverWidget.vala',
-    'src/Widgets/RevealerSwitch.vala',
+    'src/TypingSpeedCalculator.vala',
     asresources,
     dependencies: [
         dependency('glib-2.0'),
@@ -42,6 +40,21 @@ shared_module(
     install: true,
     install_dir : wingpanel_indicatorsdir
 )
+
+xinput_log_parser_test = executable(
+    'test_xinput_log_parser',
+    'src/XInputLogParser.vala',
+    'src/XInputLogParserTest.vala',
+    dependencies: [
+        dependency('glib-2.0'),
+        dependency('gobject-2.0'),
+        dependency('granite'),
+        dependency('gtk+-3.0'),
+        wingpanel_dep
+    ]
+)
+
+test('xinput_log_parser_test', xinput_log_parser_test)
 
 subdir('data')
 subdir('po')
