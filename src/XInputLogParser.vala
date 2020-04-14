@@ -44,50 +44,46 @@ public class Hackspeed.XInputLogParser {
 			this.key_map = new Gee.HashMap<string, char>();
 
 			// First row
-			this.key_map["24"] = 'a';
-			this.key_map["25"] = 'b';
-			this.key_map["26"] = 'c';
-			this.key_map["27"] = 'd';
-			this.key_map["28"] = 'e';
-			this.key_map["29"] = 'f';
-			this.key_map["30"] = 'g';
-			this.key_map["31"] = 'g';
-			this.key_map["32"] = 'g';
-			this.key_map["33"] = 'g';
-			this.key_map["34"] = 'g';
-			this.key_map["35"] = 'g';
-			this.key_map["36"] = 'g';
+			this.key_map["24"] = 'q';
+			this.key_map["25"] = 'w';
+			this.key_map["26"] = 'e';
+			this.key_map["27"] = 'r';
+			this.key_map["28"] = 't';
+			this.key_map["29"] = 'y';
+			this.key_map["30"] = 'u';
+			this.key_map["31"] = 'i';
+			this.key_map["32"] = 'o';
+			this.key_map["33"] = 'p';
+			this.key_map["34"] = '[';
+			this.key_map["35"] = ']';
 
 			// Second row
 			this.key_map["38"] = 'a';
-			this.key_map["39"] = 'b';
-			this.key_map["40"] = 'c';
-			this.key_map["41"] = 'd';
-			this.key_map["42"] = 'e';
-			this.key_map["43"] = 'f';
-			this.key_map["43"] = 'g';
-			this.key_map["44"] = 'g';
-			this.key_map["45"] = 'g';
-			this.key_map["46"] = 'g';
-			this.key_map["47"] = 'g';
-			this.key_map["48"] = 'g';
+			this.key_map["39"] = 's';
+			this.key_map["40"] = 'd';
+			this.key_map["41"] = 'f';
+			this.key_map["42"] = 'g';
+			this.key_map["43"] = 'h';
+			this.key_map["44"] = 'j';
+			this.key_map["45"] = 'k';
+			this.key_map["46"] = 'l';
+			this.key_map["47"] = ';';
+			this.key_map["48"] = '\'';
 
 			// Third row
-			this.key_map["52"] = 'a';
-			this.key_map["53"] = 'b';
+			this.key_map["52"] = 'z';
+			this.key_map["53"] = 'x';
 			this.key_map["54"] = 'c';
-			this.key_map["55"] = 'd';
-			this.key_map["56"] = 'e';
-			this.key_map["57"] = 'f';
-			this.key_map["58"] = 'g';
-			this.key_map["59"] = 'g';
-			this.key_map["60"] = 'g';
-			this.key_map["61"] = 'g';
-			this.key_map["62"] = 'g';
-			this.key_map["63"] = 'g';
+			this.key_map["55"] = 'v';
+			this.key_map["56"] = 'b';
+			this.key_map["57"] = 'n';
+			this.key_map["58"] = 'm';
+			this.key_map["59"] = ',';
+			this.key_map["60"] = '.';
+			this.key_map["61"] = '/';
 
 			// Space bar
-			this.key_map["65"] = 's';
+			this.key_map["65"] = ' ';
 		}
 
 		return this.key_map;
