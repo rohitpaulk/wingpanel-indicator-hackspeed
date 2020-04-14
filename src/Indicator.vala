@@ -20,6 +20,8 @@
 public class Hackspeed.Indicator : Wingpanel.Indicator {
     private IndicatorWidget indicator_widget = null;
 	private Hackspeed.KeystrokeRecorder keystroke_recorder;
+	private DateTime last_updated_at = null;
+	private TimeSpan update_every = 5 * TimeSpan.SECOND;
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
 		// Unique name
@@ -38,10 +40,19 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
     }
 
 	private void update_speed_label() {
+		if (this.last_updated_at != null && this.last_updated_at.difference(new DateTime.now()) < update_every) {
+			return;
+		}
+
 		var typing_speed = this.keystroke_recorder.get_typing_speed();
 
-		double wpm = (typing_speed == null) ? 0.0 : typing_speed.words_per_minute();
-		this.indicator_widget.set_text("%s wpm".printf(Math.round(wpm).to_string()));
+		if (typing_speed == null) {
+			this.indicator_widget.set_text("... wpm");
+		} else {
+			double wpm = (typing_speed == null) ? 0.0 : typing_speed.words_per_minute();
+			this.indicator_widget.set_text("%s wpm".printf(Math.round(wpm).to_string()));
+			this.last_updated_at = new DateTime.now();
+		}
 	}
 
     public override Gtk.Widget get_display_widget () {

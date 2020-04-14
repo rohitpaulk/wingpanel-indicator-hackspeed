@@ -62,17 +62,7 @@ public class Hackspeed.KeystrokeRecorder {
 	}
 
 	public TypingSpeed? get_typing_speed() {
-		if (this.keystrokes.size < 2) {
-			return null;
-		}
-
-		var first_ts = this.keystrokes[0].timestamp;
-		var last_ts = this.keystrokes[this.keystrokes.size-1].timestamp;
-
-		return TypingSpeed() {
-			character_count = this.keystrokes.size,
-			interval_secs = (last_ts.difference(first_ts) / 1000000.0)
-		};
+		return (new TypingSpeedCalculator()).calculate_speed(this.keystrokes);
 	}
 
 	public void stop() {
