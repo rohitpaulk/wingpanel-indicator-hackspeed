@@ -85,6 +85,9 @@ public class Hackspeed.XInputLogParser {
 			this.key_map["61"] = 'g';
 			this.key_map["62"] = 'g';
 			this.key_map["63"] = 'g';
+
+			// Space bar
+			this.key_map["65"] = 's';
 		}
 
 		return this.key_map;
