@@ -21,7 +21,7 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
     private IndicatorWidget indicator_widget = null;
 	private Hackspeed.KeystrokeRecorder keystroke_recorder;
 	private DateTime last_updated_at = null;
-	private TimeSpan update_every = 5 * TimeSpan.SECOND;
+	private TimeSpan update_every = 2 * TimeSpan.SECOND;
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
 		// Unique name
@@ -40,7 +40,8 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
     }
 
 	private void update_speed_label() {
-		if (this.last_updated_at != null && this.last_updated_at.difference(new DateTime.now()) < update_every) {
+		if (this.last_updated_at != null && (new DateTime.now()).difference(this.last_updated_at) < update_every) {
+			debug("Skipping update, %f", (new DateTime.now()).difference(this.last_updated_at));
 			return;
 		}
 
