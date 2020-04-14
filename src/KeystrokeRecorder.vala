@@ -45,6 +45,8 @@ public class Hackspeed.KeystrokeRecorder {
 	private Pid child_pid;
 	private IOChannel child_stdout_channel;
 
+	private TimeSpan interval_to_record = TimeSpan.SECOND * 20;
+
 	public KeystrokeRecorder() {
 		this.keystrokes = new Gee.ArrayList<Keystroke?>();
 	}
@@ -73,10 +75,6 @@ public class Hackspeed.KeystrokeRecorder {
 		});
 	}
 
-	public int get_recent_keystrokes_count() {
-		return this.keystrokes.size;
-	}
-
 	public TypingSpeed? get_typing_speed() {
 		if (this.keystrokes.size < 2) {
 			return null;
@@ -103,16 +101,13 @@ public class Hackspeed.KeystrokeRecorder {
 
 		this.delete_stale_keystrokes();
 		this.keystroke_recorded(ch);
-
-	    debug("Number of keystrokes: %s", this.get_recent_keystrokes_count().to_string());
 	}
 
 	private void delete_stale_keystrokes () {
 		var now = new DateTime.now();
 		var first_ts = this.keystrokes[0].timestamp;
-		var interval = TimeSpan.SECOND * 20;
 
-		if (now.difference(first_ts) > interval) {
+		if (now.difference(first_ts) > this.interval_to_record) {
 			debug("deleted stale timestamp");
 			this.keystrokes.remove_at(0);
 			first_ts = this.keystrokes[0].timestamp;
