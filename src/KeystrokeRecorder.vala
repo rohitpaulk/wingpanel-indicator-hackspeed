@@ -75,8 +75,23 @@ public class Hackspeed.KeystrokeRecorder {
 			character = ch
 		});
 
+		this.delete_duplicate_keystrokes();
 		this.delete_stale_keystrokes();
 		this.keystroke_recorded(ch);
+	}
+
+	private void delete_duplicate_keystrokes () {
+		if (this.keystrokes.size <= 3) {
+			return;
+		}
+
+		var last_char = this.keystrokes[keystrokes.size-1].character;
+		var last_last_char = this.keystrokes[keystrokes.size-2].character;
+		var last_last_last_char = this.keystrokes[keystrokes.size-3].character;
+
+		if ((last_char == last_last_char) && (last_last_char == last_last_last_char)) {
+			this.keystrokes.remove_at(keystrokes.size-1);
+		}
 	}
 
 	private void delete_stale_keystrokes () {
