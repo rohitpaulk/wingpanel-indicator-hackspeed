@@ -83,7 +83,7 @@ public class Hackspeed.KeystrokeRecorder {
 		var now = new DateTime.now();
 		var first_ts = this.keystrokes[0].timestamp;
 
-		if (now.difference(first_ts) > this.interval_to_record) {
+		while (now.difference(first_ts) > this.interval_to_record) {
 			debug("deleted stale timestamp");
 			this.keystrokes.remove_at(0);
 			first_ts = this.keystrokes[0].timestamp;
