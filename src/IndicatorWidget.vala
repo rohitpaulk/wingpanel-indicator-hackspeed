@@ -1,5 +1,4 @@
 public class Hackspeed.IndicatorWidget {
-	private string text;
 	private Gtk.Label gtk_label;
 	private Gtk.Box gtk_widget;
     private Gtk.StyleContext style_context;
