@@ -8,6 +8,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
@@ -28,7 +29,7 @@ public class Hackspeed.KeystrokeRecorder {
 	private Gee.ArrayList<Keystroke?> keystrokes;
 	private string keyboard_id;
 
-	private Pid child_pid;
+	private Pid? child_pid = null;
 	private IOChannel child_stdout_channel;
 
 	private TimeSpan interval_to_record = TimeSpan.SECOND * 20;
@@ -65,8 +66,15 @@ public class Hackspeed.KeystrokeRecorder {
 		return (new TypingSpeedCalculator()).calculate_speed(this.keystrokes);
 	}
 
-	public void stop() {
-		debug("Stopping recording");
+	public void reset(string keyboard_id) {
+		this.keystrokes = new Gee.ArrayList<Keystroke?>();
+
+		// Kill child process
+		Posix.kill(this.child_pid, 9);
+		this.child_stdout_channel = null;
+		this.child_pid = null;
+
+		this.start(keyboard_id);
 	}
 
 	private void record_keystroke (char ch) {

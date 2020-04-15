@@ -57,14 +57,17 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 		}
 
 		debug("Resetting wpm indicator due to inactivity");
-		this.reset_speed_label();
+		this.reset();
 
 		return true;
 	}
 
-	public void reset_speed_label() {
+	public void reset() {
 		this.speed_updated_at = null;
+		this.last_event_at = null;
 		this.indicator_widget.set_text("0 wpm");
+
+		this.keystroke_recorder.reset("10");
 	}
 
 	private void update_speed_label() {
