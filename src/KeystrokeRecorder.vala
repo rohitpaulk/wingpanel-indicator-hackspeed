@@ -66,6 +66,10 @@ public class Hackspeed.KeystrokeRecorder {
 		return (new TypingSpeedCalculator()).calculate_speed(this.keystrokes);
 	}
 
+	public void reset_keystrokes() {
+		this.keystrokes = new Gee.ArrayList<Keystroke?>();
+	}
+
 	public void reset(string keyboard_id) {
 		this.keystrokes = new Gee.ArrayList<Keystroke?>();
 

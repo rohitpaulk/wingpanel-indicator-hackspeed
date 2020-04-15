@@ -67,7 +67,7 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 		this.last_event_at = null;
 		this.indicator_widget.set_text("0 wpm");
 
-		this.keystroke_recorder.reset("10");
+		this.keystroke_recorder.reset_keystrokes();
 	}
 
 	private void update_speed_label() {
