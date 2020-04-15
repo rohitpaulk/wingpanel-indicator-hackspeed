@@ -20,8 +20,10 @@
 public class Hackspeed.Indicator : Wingpanel.Indicator {
     private IndicatorWidget indicator_widget = null;
 	private Hackspeed.KeystrokeRecorder keystroke_recorder;
-	private DateTime last_updated_at = null;
+	private DateTime speed_updated_at = null;
+	private DateTime last_event_at = null;
 	private TimeSpan update_every = 2 * TimeSpan.SECOND;
+	private TimeSpan idle_timeout = 10 * TimeSpan.SECOND;
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
 		// Unique name
@@ -32,16 +34,42 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 		this.indicator_widget = new IndicatorWidget("0 wpm");
 
 		this.keystroke_recorder.keystroke_recorded.connect(() => {
+			this.last_event_at = (new DateTime.now());
 			this.update_speed_label();
 		});
+
+		// Value is idle_timeout / 2
+		Timeout.add_seconds(5, this.tick_handler);
 
 		// Visible on startup
 		this.visible = true;
     }
 
+	public bool tick_handler() {
+		// If we haven't received an event yet, no resetting to do
+		if (last_event_at == null) {
+			return true;
+		}
+
+		// If the last event was within the idle timeout, no resetting to do
+		if ((new DateTime.now()).difference(this.last_event_at) < idle_timeout) {
+			return true;
+		}
+
+		debug("Resetting wpm indicator due to inactivity");
+		this.reset_speed_label();
+
+		return true;
+	}
+
+	public void reset_speed_label() {
+		this.speed_updated_at = null;
+		this.indicator_widget.set_text("0 wpm");
+	}
+
 	private void update_speed_label() {
-		if (this.last_updated_at != null && (new DateTime.now()).difference(this.last_updated_at) < update_every) {
-			debug("Skipping update, %f", (new DateTime.now()).difference(this.last_updated_at));
+		if (this.speed_updated_at != null && (new DateTime.now()).difference(this.speed_updated_at) < update_every) {
+			debug("Skipping update, %f", (new DateTime.now()).difference(this.speed_updated_at));
 			return;
 		}
 
@@ -52,7 +80,7 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 		} else {
 			double wpm = (typing_speed == null) ? 0.0 : typing_speed.words_per_minute();
 			this.indicator_widget.set_text("%s wpm".printf(Math.round(wpm).to_string()));
-			this.last_updated_at = new DateTime.now();
+			this.speed_updated_at = new DateTime.now();
 		}
 	}
 
