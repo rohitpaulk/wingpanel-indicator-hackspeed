@@ -126,10 +126,10 @@ public class Hackspeed.KeystrokeRecorder {
 		try {
 			string data;
 			channel.read_line (out data, null, null);
-			print ("%s: %s", stream_name, data);
+			debug ("%s: %s", stream_name, data);
 			var ch = (new XInputLogParser()).parse_line(data);
-			debug ("processed char: %s", (ch == null) ? "UNKNOWN" : ch.to_string());
 			if (ch != null) {
+				debug ("processed char: %s", ch.to_string());
 				this.record_keystroke(ch);
 			}
 		} catch (IOChannelError e) {
