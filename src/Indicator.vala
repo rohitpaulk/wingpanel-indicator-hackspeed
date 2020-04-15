@@ -19,7 +19,8 @@
 
 public class Hackspeed.Indicator : Wingpanel.Indicator {
     private IndicatorWidget indicator_widget = null;
-	private Hackspeed.KeystrokeRecorder keystroke_recorder;
+    private PopoverWidget popover_widget = null;
+	private KeystrokeRecorder keystroke_recorder;
 	private DateTime speed_updated_at = null;
 	private DateTime last_event_at = null;
 	private TimeSpan update_every = 2 * TimeSpan.SECOND;
@@ -92,7 +93,8 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
     }
 
     public override Gtk.Widget? get_widget () {
-		return new Gtk.Label("testing");
+		this.popover_widget = new PopoverWidget();
+		return this.popover_widget.get_gtk_widget();
     }
 
     public override void opened () {}

@@ -35,6 +35,7 @@ shared_module(
     meson.project_name(),
     'src/Indicator.vala',
     'src/IndicatorWidget.vala',
+    'src/PopoverWidget.vala',
     'src/KeystrokeRecorder.vala',
     'src/XInputLogParser.vala',
     'src/TypingSpeedCalculator.vala',
