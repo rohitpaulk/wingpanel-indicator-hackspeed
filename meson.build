@@ -39,6 +39,7 @@ sources = [
     'src/PopoverWidget.vala',
     'src/KeystrokeRecorder.vala',
     'src/TypingSpeedCalculator.vala',
+    'src/TypingSpeedFormatter.vala',
     'src/keycapture.c',
 ]
 

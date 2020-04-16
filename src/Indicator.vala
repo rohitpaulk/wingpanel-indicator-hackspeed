@@ -26,17 +26,21 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 	private TimeSpan update_every = 2 * TimeSpan.SECOND;
 	private TimeSpan idle_timeout = 10 * TimeSpan.SECOND;
 
+	private TypingSpeedUnit typing_speed_unit = TypingSpeedUnit.WPM;
+
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
 		// Unique name
         Object (code_name: "wingpanel-indicator-hackspeed");
 
 		this.keystroke_recorder = new Hackspeed.KeystrokeRecorder();
 		this.keystroke_recorder.start("10");
-		this.indicator_widget = new IndicatorWidget("0 wpm");
+		this.indicator_widget = new IndicatorWidget(this.speed_formatter().format_idle());
 
 		this.keystroke_recorder.keystroke_recorded.connect(() => {
 			this.last_event_at = (new DateTime.now());
-			this.update_speed_label();
+			if (this.speed_updated_at == null || (new DateTime.now()).difference(this.speed_updated_at) >= update_every) {
+				this.update_speed_label();
+			}
 		});
 
 		// Value is idle_timeout / 2
@@ -44,6 +48,12 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 
 		// Visible on startup
 		this.visible = true;
+
+		this.popover_widget = new PopoverWidget(this.typing_speed_unit);
+		this.popover_widget.typing_speed_preference_changed.connect((new_unit) => {
+			this.typing_speed_unit = new_unit;
+			this.update_speed_label();
+		});
     }
 
 	public bool tick_handler() {
@@ -66,34 +76,32 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 	public void reset() {
 		this.speed_updated_at = null;
 		this.last_event_at = null;
-		this.indicator_widget.set_text("0 wpm");
+		this.indicator_widget.set_text(this.speed_formatter().format_idle());
 
 		this.keystroke_recorder.reset_keystrokes();
 	}
 
 	private void update_speed_label() {
-		if (this.speed_updated_at != null && (new DateTime.now()).difference(this.speed_updated_at) < update_every) {
-			debug("Skipping update, %f", (new DateTime.now()).difference(this.speed_updated_at));
-			return;
-		}
-
 		var typing_speed = this.keystroke_recorder.get_typing_speed();
 
 		if (typing_speed == null) {
-			this.indicator_widget.set_text("... wpm");
+			this.indicator_widget.set_text(this.speed_formatter().format_calculating());
 		} else {
-			double wpm = (typing_speed == null) ? 0.0 : typing_speed.words_per_minute();
-			this.indicator_widget.set_text("%s wpm".printf(Math.round(wpm).to_string()));
+			this.indicator_widget.set_text(this.speed_formatter().format(typing_speed));
 			this.speed_updated_at = new DateTime.now();
 		}
 	}
+
+	private TypingSpeedFormatter speed_formatter() {
+		return new TypingSpeedFormatter(this.typing_speed_unit);
+	}
+
 
     public override Gtk.Widget get_display_widget () {
         return this.indicator_widget.get_gtk_widget();
     }
 
     public override Gtk.Widget? get_widget () {
-		this.popover_widget = new PopoverWidget();
 		return this.popover_widget.get_gtk_widget();
     }
 
