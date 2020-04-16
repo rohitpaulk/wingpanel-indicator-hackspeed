@@ -85,7 +85,11 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 		var typing_speed = this.keystroke_recorder.get_typing_speed();
 
 		if (typing_speed == null) {
-			this.indicator_widget.set_text(this.speed_formatter().format_calculating());
+			if (this.keystroke_recorder.has_keystrokes()) {
+				this.indicator_widget.set_text(this.speed_formatter().format_calculating());
+			} else {
+				this.indicator_widget.set_text(this.speed_formatter().format_idle());
+			}
 		} else {
 			this.indicator_widget.set_text(this.speed_formatter().format(typing_speed));
 			this.speed_updated_at = new DateTime.now();

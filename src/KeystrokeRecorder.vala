@@ -60,6 +60,10 @@ public class Hackspeed.KeystrokeRecorder {
 		});
 	}
 
+	public bool has_keystrokes() {
+		return this.keystrokes.size > 0;
+	}
+
 	public TypingSpeed? get_typing_speed() {
 		return (new TypingSpeedCalculator()).calculate_speed(this.keystrokes);
 	}
