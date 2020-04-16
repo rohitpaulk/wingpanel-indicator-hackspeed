@@ -39,6 +39,7 @@ shared_module(
     'src/KeystrokeRecorder.vala',
     'src/XInputLogParser.vala',
     'src/TypingSpeedCalculator.vala',
+    'src/keycapture.c',
     asresources,
     dependencies: deps,
     install: true,
