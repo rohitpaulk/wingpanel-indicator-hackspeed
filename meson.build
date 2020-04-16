@@ -31,38 +31,34 @@ deps = [
     wingpanel_dep
 ]
 
-shared_module(
-    meson.project_name(),
+sources = [
     'src/Indicator.vala',
     'src/IndicatorWidget.vala',
     'src/PopoverWidget.vala',
     'src/KeystrokeRecorder.vala',
     'src/XInputLogParser.vala',
     'src/TypingSpeedCalculator.vala',
-    'src/keycapture.c',
+    'src/simple.c'
+]
+
+shared_module(
+    meson.project_name(),
+    sources,
     asresources,
     dependencies: deps,
     install: true,
     install_dir : wingpanel_indicatorsdir
 )
 
-xinput_log_parser_test = executable(
-    'test_xinput_log_parser',
-    'src/XInputLogParser.vala',
-    'src/XInputLogParserTest.vala',
-    dependencies: deps
-)
-
 typing_speed_calculator_test = executable(
     'test_typing_speed_calculator',
-    'src/TypingSpeedCalculator.vala',
     'src/TypingSpeedCalculatorTest.vala',
+    'src/TypingSpeedCalculator.vala',
     'src/KeystrokeRecorder.vala',
-    'src/XInputLogParser.vala',
+    'src/simple.c',
     dependencies: deps
 )
 
-test('xinput_log_parser_test', xinput_log_parser_test)
 test('typing_speed_calculator_test', typing_speed_calculator_test)
 
 subdir('data')
