@@ -43,12 +43,6 @@ void key_pressed_cb(XPointer arg, XRecordInterceptData *d) {
         case KeyRelease:
             g_signal_emit_by_name (arg, "captured", XKeysymToString (XkbKeycodeToKeysym (dpy, detail, 0, shiftlevel)), TRUE);
             break;
-        case ButtonPress:
-            g_signal_emit_by_name (arg, "captured-mouse", event->u.keyButtonPointer.rootX, event->u.keyButtonPointer.rootY, event->u.u.detail);
-            break;
-        case MotionNotify:
-            g_signal_emit_by_name (arg, "captured-move", event->u.keyButtonPointer.rootX, event->u.keyButtonPointer.rootY);
-            break;
         default:
             break;
     }

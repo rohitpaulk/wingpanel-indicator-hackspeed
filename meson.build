@@ -28,6 +28,8 @@ deps = [
     dependency('granite'),
     meson.get_compiler('vala').find_library('posix'),
     dependency('gtk+-3.0'),
+    dependency('x11'),
+    dependency('xtst'),
     wingpanel_dep
 ]
 
@@ -36,9 +38,8 @@ sources = [
     'src/IndicatorWidget.vala',
     'src/PopoverWidget.vala',
     'src/KeystrokeRecorder.vala',
-    'src/XInputLogParser.vala',
     'src/TypingSpeedCalculator.vala',
-    'src/simple.c'
+    'src/keycapture.c',
 ]
 
 shared_module(
@@ -55,7 +56,7 @@ typing_speed_calculator_test = executable(
     'src/TypingSpeedCalculatorTest.vala',
     'src/TypingSpeedCalculator.vala',
     'src/KeystrokeRecorder.vala',
-    'src/simple.c',
+    'src/keycapture.c',
     dependencies: deps
 )
 

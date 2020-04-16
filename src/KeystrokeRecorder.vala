@@ -27,38 +27,36 @@ public class Hackspeed.KeystrokeRecorder {
 	public signal void keystroke_recorded (char character);
 
 	private Gee.ArrayList<Keystroke?> keystrokes;
-	private string keyboard_id;
-
-	private Pid? child_pid = null;
-	private IOChannel child_stdout_channel;
-
 	private TimeSpan interval_to_record = TimeSpan.SECOND * 20;
+
+	[CCode (cname = "intercept_key_thread")]
+	public extern void *intercept_key_thread ();
+
+	public signal void captured (string keyvalue, bool released);
+
+	// Not used, part of keycapture.c
+	public signal void captured_mouse (int x, int y, int button);
+	public signal void captured_move (int x, int y);
 
 	public KeystrokeRecorder() {
 		this.keystrokes = new Gee.ArrayList<Keystroke?>();
 	}
 
 	public void start(string keyboard_id) {
-		this.keyboard_id = keyboard_id;
-		debug("Recording for keyboard_id %s", keyboard_id);
+		debug("Recording keystrokes");
 
-		int child_stdout;
+		try {
+			//Thread.create<void*> (this.intercept_key_thread, true);
+			new Thread<void*>.try (null, this.intercept_key_thread);
+		} catch (Error e) {
+			stderr.printf (e.message);
+		}
 
-		Process.spawn_async_with_pipes(
-			"/tmp",
-			{"xinput", "test", this.keyboard_id},
-			Environ.get(),
-			SpawnFlags.SEARCH_PATH,
-			null,
-			out this.child_pid,
-			null,
-			out child_stdout,
-			null
-		);
-
-		this.child_stdout_channel = new IOChannel.unix_new(child_stdout);
-		child_stdout_channel.add_watch (IOCondition.IN | IOCondition.HUP, (channel, condition) => {
-			return this.process_line(channel, condition, "stdout");
+		this.captured.connect((keyvalue, released) => {
+			debug("Got key %s", keyvalue);
+			if (released == true && keyvalue.length == 1) {
+				this.record_keystroke((char) keyvalue);
+			}
 		});
 	}
 
@@ -105,31 +103,4 @@ public class Hackspeed.KeystrokeRecorder {
 			first_ts = this.keystrokes[0].timestamp;
 		}
 	}
-
-	private bool process_line (IOChannel channel, IOCondition condition, string stream_name) {
-		if (condition == IOCondition.HUP) {
-			debug ("%s: The fd has been closed.\n", stream_name);
-			return false;
-		}
-
-		try {
-			string data;
-			channel.read_line (out data, null, null);
-			debug ("%s: %s", stream_name, data);
-			var ch = (new XInputLogParser()).parse_line(data);
-			if (ch != null) {
-				debug ("processed char: %s", ch.to_string());
-				this.record_keystroke(ch);
-			}
-		} catch (IOChannelError e) {
-			print ("%s: IOChannelError: %s\n", stream_name, e.message);
-			return false;
-		} catch (ConvertError e) {
-			print ("%s: ConvertError: %s\n", stream_name, e.message);
-			return false;
-		}
-
-		return true;
-	}
-
 }
