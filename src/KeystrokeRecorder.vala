@@ -70,17 +70,6 @@ public class Hackspeed.KeystrokeRecorder {
 		this.keystrokes = new Gee.ArrayList<Keystroke?>();
 	}
 
-	public void reset(string keyboard_id) {
-		this.keystrokes = new Gee.ArrayList<Keystroke?>();
-
-		// Kill child process
-		Posix.kill(this.child_pid, 9);
-		this.child_stdout_channel = null;
-		this.child_pid = null;
-
-		this.start(keyboard_id);
-	}
-
 	private void record_keystroke (char ch) {
 		this.keystrokes.add(Keystroke() {
 			timestamp = new DateTime.now(),
