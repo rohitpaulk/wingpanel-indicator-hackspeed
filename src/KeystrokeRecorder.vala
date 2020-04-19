@@ -23,6 +23,12 @@ public struct Keystroke {
 	char character;
 }
 
+[DBus (name = "org.gnome.SessionManager")]
+interface SessionManager : Object {
+    public signal void properties_updated();
+}
+
+
 public class Hackspeed.KeystrokeRecorder {
 	public signal void keystroke_recorded ();
 
@@ -38,20 +44,48 @@ public class Hackspeed.KeystrokeRecorder {
 
 	private Thread<void*> recorder_thread;
 
+	private SessionManager session_manager_proxy;
+
 	public KeystrokeRecorder() {
 		this.keystroke_collection = new KeystrokeCollection();
+
+		this.session_manager_proxy = new DBusProxy.for_bus_sync(
+			BusType.SESSION,
+			DBusProxyFlags.DO_NOT_LOAD_PROPERTIES,
+			null,
+			"org.gnome.SessionManager",
+			"/org/gnome/SessionManager",
+			"org.freedesktop.DBus.Properties"
+		);
 	}
 
 	public void start(string keyboard_id) {
 		debug("Recording keystrokes");
 
 		this.start_recorder_thread();
-
 		this.captured.connect((keyvalue, released) => {
 			debug("Got key %s", keyvalue);
 			if (released == true && keyvalue.length == 1) {
 				this.record_keystroke((char) keyvalue);
 			}
+		});
+
+		this.session_manager_proxy.g_properties_changed.connect((changed) => {
+			debug("Properties changed!");
+			var is_session_active_v = changed.lookup_value("SessionIsActive", VariantType.BOOLEAN);
+			if (is_session_active_v != null) {
+				var is_session_active = is_session_active_v.get_boolean();
+				debug("Property: %s", is_session_active.to_string());
+			}
+		});
+
+		this.session_manager_proxy.g_properties_changed.connect(() => {
+			debug("1) Properties changed.....!");
+		});
+
+		this.session_manager_proxy.g_signal.connect((sender_name, signal_name, parameters) => {
+			debug("Some signal %s", signal_name);
+			parameters.print(true);
 		});
 	}
 
