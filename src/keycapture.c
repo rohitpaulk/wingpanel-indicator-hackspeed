@@ -71,9 +71,13 @@ void* intercept_key_thread (void *data) {
 
     XFree (rr);
 
+    fprintf (stderr, "Enabling XRecord...\n");
+
     if (!XRecordEnableContext (dpy, rc, key_pressed_cb, data)) {
         fprintf (stderr, "XRecordEnableContext error\n");
     }
+
+    fprintf (stderr, "XRecord enabled, exiting\n");
 
     return 0;
 }

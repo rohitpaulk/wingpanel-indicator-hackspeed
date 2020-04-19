@@ -24,33 +24,28 @@ public struct Keystroke {
 }
 
 public class Hackspeed.KeystrokeRecorder {
-	public signal void keystroke_recorded (char character);
+	public signal void keystroke_recorded ();
 
-	private Gee.ArrayList<Keystroke?> keystrokes;
-	private TimeSpan interval_to_record = TimeSpan.SECOND * 20;
+	private KeystrokeCollection keystroke_collection;
 
 	[CCode (cname = "intercept_key_thread")]
 	public extern void *intercept_key_thread ();
 
 	public signal void captured (string keyvalue, bool released);
 
-	// Not used, part of keycapture.c
 	public signal void captured_mouse (int x, int y, int button);
 	public signal void captured_move (int x, int y);
 
+	private Thread<void*> recorder_thread;
+
 	public KeystrokeRecorder() {
-		this.keystrokes = new Gee.ArrayList<Keystroke?>();
+		this.keystroke_collection = new KeystrokeCollection();
 	}
 
 	public void start(string keyboard_id) {
 		debug("Recording keystrokes");
 
-		try {
-			//Thread.create<void*> (this.intercept_key_thread, true);
-			new Thread<void*>.try (null, this.intercept_key_thread);
-		} catch (Error e) {
-			stderr.printf (e.message);
-		}
+		this.start_recorder_thread();
 
 		this.captured.connect((keyvalue, released) => {
 			debug("Got key %s", keyvalue);
@@ -60,51 +55,45 @@ public class Hackspeed.KeystrokeRecorder {
 		});
 	}
 
+	private void start_recorder_thread() {
+		try {
+			this.recorder_thread = new Thread<void*>.try ("wpmrecorder", this.intercept_key_thread);
+			debug("Intercept thread has been setup");
+			if (this.recorder_thread != null) {
+				new Thread<int>("threadwatcher", this.restart_recorder_thread_if_exits);
+			}
+		} catch (Error e) {
+			stderr.printf (e.message);
+		}
+	}
+
+	public int restart_recorder_thread_if_exits() {
+		debug("Waiting for recorder thread to die");
+		this.recorder_thread.join();
+		debug("Restarting recorder thread");
+		this.start_recorder_thread();
+
+		return 1;
+	}
+
 	public bool has_keystrokes() {
-		return this.keystrokes.size > 0;
+		return this.keystroke_collection.has_keystrokes();
 	}
 
 	public TypingSpeed? get_typing_speed() {
-		return (new TypingSpeedCalculator()).calculate_speed(this.keystrokes);
+		return (new TypingSpeedCalculator()).calculate_speed(this.keystroke_collection.keystrokes);
 	}
 
 	public void reset_keystrokes() {
-		this.keystrokes = new Gee.ArrayList<Keystroke?>();
+		this.keystroke_collection = new KeystrokeCollection();
 	}
 
 	private void record_keystroke (char ch) {
-		this.keystrokes.add(Keystroke() {
+		this.keystroke_collection.add(Keystroke() {
 			timestamp = new DateTime.now(),
 			character = ch
 		});
 
-		this.delete_duplicate_keystrokes();
-		this.delete_stale_keystrokes();
-		this.keystroke_recorded(ch);
-	}
-
-	private void delete_duplicate_keystrokes () {
-		if (this.keystrokes.size <= 3) {
-			return;
-		}
-
-		var last_char = this.keystrokes[keystrokes.size-1].character;
-		var last_last_char = this.keystrokes[keystrokes.size-2].character;
-		var last_last_last_char = this.keystrokes[keystrokes.size-3].character;
-
-		if ((last_char == last_last_char) && (last_last_char == last_last_last_char)) {
-			this.keystrokes.remove_at(keystrokes.size-1);
-		}
-	}
-
-	private void delete_stale_keystrokes () {
-		var now = new DateTime.now();
-		var first_ts = this.keystrokes[0].timestamp;
-
-		while (now.difference(first_ts) > this.interval_to_record) {
-			debug("deleted stale timestamp");
-			this.keystrokes.remove_at(0);
-			first_ts = this.keystrokes[0].timestamp;
-		}
+		this.keystroke_recorded();
 	}
 }

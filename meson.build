@@ -38,6 +38,7 @@ sources = [
     'src/IndicatorWidget.vala',
     'src/PopoverWidget.vala',
     'src/KeystrokeRecorder.vala',
+    'src/KeystrokeCollection.vala',
     'src/TypingSpeedCalculator.vala',
     'src/TypingSpeedFormatter.vala',
     'src/keycapture.c',
@@ -57,6 +58,7 @@ typing_speed_calculator_test = executable(
     'src/TypingSpeedCalculatorTest.vala',
     'src/TypingSpeedCalculator.vala',
     'src/KeystrokeRecorder.vala',
+    'src/KeystrokeCollection.vala',
     'src/keycapture.c',
     dependencies: deps
 )
