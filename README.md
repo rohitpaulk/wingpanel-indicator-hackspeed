@@ -1,7 +1,4 @@
-# Wingpanel Nightlight Indicator
-[![Translation status](https://l10n.elementary.io/widgets/wingpanel/-/indicator-nightlight/svg-badge.svg)](https://l10n.elementary.io/engage/wingpanel/?utm_source=widget)
-
-![Screenshot](data/screenshot.png?raw=true)
+# Wingpanel Hackspeed Indicator
 
 ## Building and Installation
 
