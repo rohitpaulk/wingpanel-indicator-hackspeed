@@ -17,31 +17,56 @@
  * Boston, MA 02110-1301 USA
  */
 
+[DBus (name = "org.freedesktop.DBus.Properties")]
+interface SessionManager : Object {
+    public signal void properties_changed (string interface_name, HashTable<string, Variant> changed_properties, string[] invalidated_properties);
+}
+
 public class Hackspeed.Indicator : Wingpanel.Indicator {
     private IndicatorWidget indicator_widget = null;
     private PopoverWidget popover_widget = null;
-	private KeystrokeRecorder keystroke_recorder;
-	private DateTime speed_updated_at = null;
-	private DateTime last_event_at = null;
+
 	private TimeSpan update_every = 2 * TimeSpan.SECOND;
 	private TimeSpan idle_timeout = 10 * TimeSpan.SECOND;
-
 	private TypingSpeedUnit typing_speed_unit = TypingSpeedUnit.WPM;
+
+	private DateTime speed_updated_at = null;
+	private DateTime last_event_at = null;
+
+	private KeystrokeRecorder keystroke_recorder;
+	private SessionManager session_manager;
 
     public Indicator (Wingpanel.IndicatorManager.ServerType server_type) {
 		// Unique name
         Object (code_name: "wingpanel-indicator-hackspeed");
 
 		this.keystroke_recorder = new Hackspeed.KeystrokeRecorder();
-		this.keystroke_recorder.start("10");
-		this.indicator_widget = new IndicatorWidget(this.speed_formatter().format_idle());
-
+		this.keystroke_recorder.start();
 		this.keystroke_recorder.keystroke_recorded.connect(() => {
-			this.last_event_at = (new DateTime.now());
-			if (this.speed_updated_at == null || (new DateTime.now()).difference(this.speed_updated_at) >= update_every) {
-				this.update_speed_label();
+			this.on_keystroke_recorded();
+		});
+
+		this.session_manager = Bus.get_proxy_sync(
+			BusType.SESSION,
+			"org.gnome.SessionManager",
+			"/org/gnome/SessionManager"
+		);
+
+		this.session_manager.properties_changed.connect((interface_name, changed, invalidated) => {
+			if (changed.contains("SessionIsActive")) {
+				var session_is_active = changed.get("SessionIsActive").get_boolean();
+				if (session_is_active) {
+					debug("Logged in, refreshing in 20..");
+					Timeout.add_seconds(20, () => {
+						debug("refreshed after 20 seconds");
+						this.reset();
+						return false;
+					});
+				}
 			}
 		});
+
+		this.indicator_widget = new IndicatorWidget(this.speed_formatter().format_idle());
 
 		// Value is idle_timeout / 2
 		Timeout.add_seconds(5, this.tick_handler);
@@ -55,6 +80,13 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 			this.update_speed_label();
 		});
     }
+
+	public void on_keystroke_recorded() {
+		this.last_event_at = (new DateTime.now());
+		if (this.speed_updated_at == null || (new DateTime.now()).difference(this.speed_updated_at) >= update_every) {
+			this.update_speed_label();
+		}
+	}
 
 	public bool tick_handler() {
 		// If we haven't received an event yet, no resetting to do
@@ -78,7 +110,12 @@ public class Hackspeed.Indicator : Wingpanel.Indicator {
 		this.last_event_at = null;
 		this.indicator_widget.set_text(this.speed_formatter().format_idle());
 
-		this.keystroke_recorder.reset_keystrokes();
+		// this.keystroke_recorder.reset_keystrokes();
+		this.keystroke_recorder = new Hackspeed.KeystrokeRecorder();
+		this.keystroke_recorder.start();
+		this.keystroke_recorder.keystroke_recorded.connect(() => {
+			this.on_keystroke_recorded();
+		});
 	}
 
 	private void update_speed_label() {

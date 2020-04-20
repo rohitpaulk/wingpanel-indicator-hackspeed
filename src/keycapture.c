@@ -20,7 +20,7 @@
 #include <X11/XKBlib.h>
 #include <X11/extensions/record.h> // libxtst-dev, Xtst
 
-static Display* dpy = 0;
+static Display* dpy;
 static XRecordContext rc;
 
 void key_pressed_cb(XPointer arg, XRecordInterceptData *d) {
@@ -53,9 +53,13 @@ void key_pressed_cb(XPointer arg, XRecordInterceptData *d) {
 void* intercept_key_thread (void *data) {
     XRecordClientSpec rcs;
     XRecordRange* rr;
-    dpy = XOpenDisplay (0);
+    dpy = XOpenDisplay (NULL);
 
-    XKeysymToString (XkbKeycodeToKeysym (dpy, 11, 1, 0));
+    if (rc != NULL) {
+        if (!(rc = XRecordDisableContext (dpy, rc))) {
+            fprintf (stderr, "XRecordDisableContext error\n");
+        }
+    }
 
     if (!(rr = XRecordAllocRange ())) {
         fprintf (stderr, "XRecordAllocRange error\n");
@@ -71,13 +75,12 @@ void* intercept_key_thread (void *data) {
 
     XFree (rr);
 
-    fprintf (stderr, "Enabling XRecord...\n");
+    // No idea why this is needed - key recording doesn't seem to work without it!
+    XkbKeycodeToKeysym (dpy, 11, 1, 0);
 
     if (!XRecordEnableContext (dpy, rc, key_pressed_cb, data)) {
         fprintf (stderr, "XRecordEnableContext error\n");
     }
-
-    fprintf (stderr, "XRecord enabled, exiting\n");
 
     return 0;
 }
